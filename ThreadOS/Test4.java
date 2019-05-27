@@ -1,4 +1,3 @@
-
 import java.util.*;
 import java.io.*;
 import java.util.Date;
@@ -11,18 +10,24 @@ public class Test4 extends Thread {
 	private int testing;
 	private String status 			= "disabled";
 	private boolean cacheEnabled 	= false;	
-	private byte[] readBuffer;	
-	private byte[] writeBuffer;	
+	private byte[] readBytes;	
+	private byte[] writeBytes;	
 	private Random random;
 
-	private long startWriteTime;                           
-    private long stopWriteTime;                            
-    private long startReadTime;                            
-    private long stopReadTime;  
+	private long startTime;                           
+    private long stopTime;                            
+
+    private void getPerformance(String testName) {
+    	if (enabled == true) {
+	      SysLib.cout("Test " + testName + "(cache enabled): " + (stopTime - startTime) + "\n");
+	    } else {
+	      SysLib.cout("Test " + testName + "(cache disabled): " + (stopTime - startTime) + "\n");
+		}
+  	}
 
 	public Test4(String[] args) {
-		writeBuffer = new byte[diskBlockSize];               
-        readBuffer 	= new byte[diskBlockSize]; 
+		writeBytes = new byte[diskBlockSize];               
+        readBytes 	= new byte[diskBlockSize]; 
 		random 		= new Random();
 
 		if(args[0].equals("enabled")) {
@@ -38,22 +43,31 @@ public class Test4 extends Thread {
     }
 
 	public void run( ) {
-    	SysLib.flush();							
+    	SysLib.flush();
+    	startTime = new Date().getTime();							
     	switch(testing) {                               
     		case 1:	{
-				randomAccess(); 	
+				randomAccess();
+				stopTime = new Date().getTime();
+				getPerformance("Random Access");	 	
 				break;        
 			}
     		case 2: {
 				localizedAccess();	
+				stopTime = new Date().getTime();
+				getPerformance("Localized Access");	
 				break;        
 			}
 			case 3: {
 				mixedAccess(); 	
+				stopTime = new Date().getTime();
+				getPerformance("Mixed Access");	
 				break;        
 			}
     		case 4: {
 				adversaryAccess(); 	
+				stopTime = new Date().getTime();
+				getPerformance("Adversary Access");	
 				break;        
 			}	      			  			  			  			  			
     	}
@@ -83,44 +97,33 @@ public class Test4 extends Thread {
 	}
 
 	private void randomAccess() {
-		random.nextBytes(writeBuffer); 
+		random.nextBytes(writeBytes); 
 		int[] randomAccessArr = new int[arrayTest];
 		
 		for(int i = 0; i < arrayTest; i++) {
 			randomAccessArr[i] = Math.abs(random.nextInt() % diskBlockSize);
 		}
-		
-		startWriteTime = new Date().getTime();	
 
 		for (int i = 0; i < arrayTest; i++) {
-			writer(randomAccessArr[i], writeBuffer); 
+			writer(randomAccessArr[i], writeBytes); 
 		}
-
-		stopWriteTime = new Date().getTime(); 
-		startReadTime = new Date().getTime();	
 
 		for(int i = 0; i < arrayTest; i++) {	
-			reader(randomAccessArr[i], readBuffer);
+			reader(randomAccessArr[i], readBytes);
 		}
-		
-		stopReadTime = new Date().getTime();	
 
-		if(!(Arrays.equals(writeBuffer, readBuffer))) {
-			 SysLib.cout("DISK VALIDITY ERROR: writerBytes and readBuffer equal\n");
+		if(!(Arrays.equals(writeBytes, readBytes))) {
+			 SysLib.cout("DISK VALIDITY ERROR: writerBytes and readBytes equal\n");
 		}	
-		SysLib.cout("Testing randomAccess(), using Test :" + testing + "\n");
-		SysLib.cout("Cache: [" + status + "] \n");
-		SysLib.cout("Avg time for Write : " + ((stopWriteTime - startWriteTime) / 200) + " ms \n");
-		SysLib.cout("Avg time for Read  : " + ((stopReadTime - startReadTime) / 200)+ " ms \n");
 	}
 
 	private void localizedAccess() {    
-		random.nextBytes(writeBuffer); 
+		random.nextBytes(writeBytes); 
 		startWriteTime = new Date().getTime();
         
         for(int i = 0; i < arrayTest; i++) {                
           for(int j = 0; j < cachedBlocks; j++)	{                  
-			writer(j, writeBuffer); 
+			writer(j, writeBytes); 
 			}
 		}
         
@@ -129,23 +132,19 @@ public class Test4 extends Thread {
 
         for(int i = 0; i < arrayTest; i++) {                
         	for(int j = 0; j < cachedBlocks; j++) {  
-				reader(j, readBuffer);
+				reader(j, readBytes);
 			}
         }
 		stopReadTime = new Date().getTime();
 	
-		if(!(Arrays.equals(writeBuffer, readBuffer))) {
-			 SysLib.cout("DISK VALIDITY ERROR: writerBytes and readBuffer equal\n");
+		if(!(Arrays.equals(writeBytes, readBytes))) {
+			 SysLib.cout("DISK VALIDITY ERROR: writerBytes and readBytes equal\n");
 		}
-		SysLib.cout("Testing localizedAccess(), using Test :" + testing + "\n");
-		SysLib.cout("Cache: [" + status + "] \n");
-		SysLib.cout("Avg time for Write : " + ((stopWriteTime - startWriteTime) / 200) + " ms \n");
-		SysLib.cout("Avg time for Read  : " + ((stopReadTime - startReadTime) / 200)+ " ms \n");
     }
 
 	private void mixedAccess()
 	{ 
-		random.nextBytes(writeBuffer);
+		random.nextBytes(writeBytes);
 		int[] mixedAccessArr = new int[arrayTest];            
         for(int i = 0; i < arrayTest; i++) {   
             if(Math.abs(random.nextInt() % cachedBlocks) <= 8) {
@@ -157,48 +156,37 @@ public class Test4 extends Thread {
 		
 		startWriteTime = new Date().getTime();		
         for(int i = 0; i < arrayTest; i++) {    
-             writer(mixedAccessArr[i], writeBuffer);              
+             writer(mixedAccessArr[i], writeBytes);              
         }
         stopWriteTime = new Date().getTime();				
 		startReadTime = new Date().getTime();			
         
         for(int i = 0; i < arrayTest; i++) {            
-            reader(mixedAccessArr[i], readBuffer);                         
+            reader(mixedAccessArr[i], readBytes);                         
         }
         stopReadTime = new Date().getTime();			
 		
-		if(!(Arrays.equals(writeBuffer, readBuffer))) {
-			 SysLib.cout("DISK VALIDITY ERROR: writerBytes and readBuffer equal\n");
+		if(!(Arrays.equals(writeBytes, readBytes))) {
+			 SysLib.cout("DISK VALIDITY ERROR: writerBytes and readBytes equal\n");
 		}
-
-		SysLib.cout("Testing mixedAccess(), using Test :" + testing + "\n");
-		SysLib.cout("Cache: [" + status + "] \n");
-		SysLib.cout("Avg time for Write : " + ((stopWriteTime - startWriteTime) / 200) + " ms \n");
-		SysLib.cout("Avg time for Read  : " + ((stopReadTime - startReadTime) / 200)+ " ms \n");
     }
 
 	private void adversaryAccess() {	
-		random.nextBytes(writeBuffer); 
+		random.nextBytes(writeBytes); 
         startWriteTime = new Date().getTime();   		
         for (int i = cachedBlocks; i < diskBlockSize; i++) {                                 
-            writer(i, writeBuffer);                  
+            writer(i, writeBytes);                  
         }        
         stopWriteTime = new Date().getTime();  			
 		
         startReadTime = new Date().getTime();                     
         for (int i = cachedBlocks; i < diskBlockSize; i++) {              
-            reader(i, readBuffer);                             
+            reader(i, readBytes);                             
         }        
         stopReadTime = new Date().getTime();    		
 		
-		if(!(Arrays.equals(writeBuffer, readBuffer))) {
-			 SysLib.cout("DISK VALIDITY ERROR: writerBytes and readBuffer equal\n");
+		if(!(Arrays.equals(writeBytes, readBytes))) {
+			 SysLib.cout("DISK VALIDITY ERROR: writerBytes and readBytes equal\n");
 		}
-
-		SysLib.cout("Testing adversaryAccess(), using Test :" + testing + "\n");
-		SysLib.cout("Cache: [" + status + "] \n");
-		SysLib.cout("Avg time for Write : " + ((stopWriteTime - startWriteTime) / 200) + " ms \n");
-		SysLib.cout("Avg time for Read  : " + ((stopReadTime - startReadTime) / 200)+ " ms \n");
-
     }
 }
