@@ -30,13 +30,13 @@ public class Test4 extends Thread {
     // Return Performance of each Test. 
     private void getPerformance(String testName) {
     	if (enabled == true) {
-	      	SysLib.cout("Test: | " + testName + " | Cache: Enabled | " 			+ (stopTime 	- startTime) 	+ "ms \n");
-	      	SysLib.cout("Read: | " + ((stopRead 	- startRead) 	/ 200)	+ "ms \n");
-	      	SysLib.cout("Write | " + ((stopWrite 	- startWrite) 	/ 200) 	+ "ms \n");
+	      	SysLib.cout("Test Name 	| " + testName + " | Cache: Enabled | " 	+ (stopTime - startTime) + "ms \n");
+	      	SysLib.cout("Read Avg 	| "	+ ((stopRead 	- startRead) 	/ 200)	+ "ms \n");
+	      	SysLib.cout("Write Avg 	| " + ((stopWrite 	- startWrite) 	/ 200) 	+ "ms \n");
 	    } else {
-	    	SysLib.cout("Test: | " + testName + " | Cache: Disabled | " 			+ (stopTime 	- startTime) 	+ "ms \n");
-	      	SysLib.cout("Read: | " + ((stopRead 	- startRead) 	/ 200)	+ "ms \n");
-	      	SysLib.cout("Write | " + ((stopWrite 	- startWrite) 	/ 200) 	+ "ms \n");
+	    	SysLib.cout("Test Name 	| " + testName + " | Cache: Disabled | " 	+ (stopTime - startTime) + "ms \n");
+	      	SysLib.cout("Read Avg 	| "	+ ((stopRead 	- startRead) 	/ 200)	+ "ms \n");
+	      	SysLib.cout("Write Avg 	| " + ((stopWrite 	- startWrite) 	/ 200) 	+ "ms \n");
 		}
   	}
 
@@ -144,10 +144,14 @@ public class Test4 extends Thread {
 		for (int i = 0; i < 20; i++) {
 	     	for (int j = 0; j < blockSize; j++) {
 	        	writeBytes[j] = ((byte)(i + j));
-	     	} 
+	     	}
+	     	startWrite = new Date().getTime(); 
 	      	for (int j = 0; j < 1000; j += 100) {
 	        	write(j, writeBytes);
 	      	}
+	      	stopWrite = new Date().getTime();
+
+	      	startRead = new Date().getTime();
 	     	for (int j = 0; j < 1000; j += 100) {
 	        	read(j, readBytes);
 		        for (int k = 0; k < blockSize; k++) {
@@ -155,8 +159,9 @@ public class Test4 extends Thread {
 						SysLib.cerr("ERROR\n");
 	            		SysLib.exit();
 					}
-	        	}
+	        	} 
 	      	}
+	      	stopRead = new Date().getTime(); 
 	    }
     }
 
@@ -170,13 +175,18 @@ public class Test4 extends Thread {
             } else {   
                 mixedAccessArr[i] = Math.abs(random.nextInt() % blockSize);         
             }            
-        }	
+        }
+        startWrite = new Date().getTime(); 	
         for(int i = 0; i < arrayTest; i++) {    
             write(mixedAccessArr[i], writeBytes);              
-        }		
+        }
+        stopWrite = new Date().getTime();	
+
+        startRead = new Date().getTime();		
         for(int i = 0; i < arrayTest; i++) {            
             read(mixedAccessArr[i], readBytes);                         
-        }		
+        }
+        stopRead = new Date().getTime();		
 		if(!(Arrays.equals(writeBytes, readBytes))) {
 			SysLib.cerr("ERROR\n");
             SysLib.exit();
@@ -184,13 +194,19 @@ public class Test4 extends Thread {
     }
 
     // Test to access blocks that will generate a miss. 
-	private void adversaryAccess() {	
+	private void adversaryAccess() {
+		startWrite = new Date().getTime();	
         for (int i = cacheBlocks; i < blockSize; i++) {                                 
             write(i, writeBytes);                  
-        }                    
+        }        
+        stopWrite = new Date().getTime();
+
+        startRead = new Date().getTime();	
         for (int i = cacheBlocks; i < blockSize; i++) {              
             read(i, readBytes);                             
-        }        			
+        }  
+        stopRead = new Date().getTime();
+
 		if(!(Arrays.equals(writeBytes, readBytes))) {
 			SysLib.cerr("ERROR\n");
             SysLib.exit();
