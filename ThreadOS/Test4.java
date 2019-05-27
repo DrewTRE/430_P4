@@ -21,14 +21,22 @@ public class Test4 extends Thread {
 	private byte[] writeBytes;	
 	private Random random;
 	private long startTime;                           
-    private long stopTime;                            
+    private long stopTime;  
+    private long startRead; 
+    private long stopRead; 
+    private long startWrite; 
+    private long stopWrite;                           
 
     // Return Performance of each Test. 
     private void getPerformance(String testName) {
     	if (enabled == true) {
-	      SysLib.cout("Test: | " + testName + " | Cache: Enabled | " 	+ (stopTime - startTime) + "ms \n");
+	      	SysLib.cout("Test: | " + testName + " | Cache: Enabled | " 			+ (stopTime 	- startTime) 	+ "ms \n");
+	      	SysLib.cout("Read: | " + ((stopRead 	- startRead) 	/ 200)	+ "ms \n");
+	      	SysLib.cout("Write | " + ((stopWrite 	- startWrite) 	/ 200) 	+ "ms \n");
 	    } else {
-	      SysLib.cout("Test: | " + testName + " | Cache: Disabled | " 	+ (stopTime - startTime) + "ms \n");
+	    	SysLib.cout("Test: | " + testName + " | Cache: Disabled | " 			+ (stopTime 	- startTime) 	+ "ms \n");
+	      	SysLib.cout("Read: | " + ((stopRead 	- startRead) 	/ 200)	+ "ms \n");
+	      	SysLib.cout("Write | " + ((stopWrite 	- startWrite) 	/ 200) 	+ "ms \n");
 		}
   	}
 
@@ -113,16 +121,22 @@ public class Test4 extends Thread {
 		for(int i = 0; i < arrayTest; i++) {
 			randomAccessArr[i] = Math.abs(random.nextInt() % blockSize);
 		}
+		startWrite = new Date().getTime();
 		for (int i = 0; i < arrayTest; i++) {
 			write(randomAccessArr[i], writeBytes); 
 		}
+		stopWrite = new Date().getTime();
+
+		startRead = new Date().getTime();
 		for(int i = 0; i < arrayTest; i++) {	
 			read(randomAccessArr[i], readBytes);
 		}
+		stopRead = new Date().getTime();
 		if(!(Arrays.equals(writeBytes, readBytes))) {
 			SysLib.cerr("ERROR\n");
             SysLib.exit();
 		}	
+
 	}
 
 	// Localized test that read and writes on the same 10 blocks repeatedly.  
