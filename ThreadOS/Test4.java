@@ -77,27 +77,7 @@ public class Test4 extends Thread {
 				stopTime = new Date().getTime();
 				getPerformance("Adversary Access");	
 				break;        
-			}
-			case 5: {
-				randomAccess();
-				stopTime = new Date().getTime();
-				getPerformance("Random Access");
-
-				startTime = new Date().getTime();	
-				localizedAccess();	
-				stopTime = new Date().getTime();
-				getPerformance("Localized Access");
-
-				startTime = new Date().getTime();	
-				mixedAccess(); 	
-				stopTime = new Date().getTime();
-				getPerformance("Mixed Access");
-
-				startTime = new Date().getTime();	
-				adversaryAccess(); 	
-				stopTime = new Date().getTime();
-				getPerformance("Adversary Access");	
-			}  	      			  			  			  			  			
+			}     			  			  			  			  			
     	}
     	// Sync with disk depending on if cache is enabled or disabled. 		
 		if(enabled) {
