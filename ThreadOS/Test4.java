@@ -13,7 +13,6 @@ public class Test4 extends Thread {
 	private byte[] readBytes;	
 	private byte[] writeBytes;	
 	private Random random;
-
 	private long startTime;                           
     private long stopTime;                            
 
@@ -118,23 +117,22 @@ public class Test4 extends Thread {
 		}	
 	}
 
-	private void localizedAccess() {    
-        for(int i = 0; i < arrayTest; i++) {                
-          	for(int j = 0; j < cachedBlocks; j++)	{                  
-				write(j, writeBytes); 
-			}
-		}	
-
-        for(int i = 0; i < arrayTest; i++) {                
-        	for(int j = 0; j < cachedBlocks; j++) {  
-				read(j, readBytes);
-			}
-        }
-	
-		if(!(Arrays.equals(writeBytes, readBytes))) {
-			SysLib.cerr("ERROR\n");
-            SysLib.exit();
-		}
+	private void localizedAccess() {  
+		for (int i = 0; i < 20; i++) {
+	     	for (int j = 0; j < diskBlockSize; j++)
+	        	writeBytes[j] = ((byte)(i + j));
+	      	for (j = 0; j < 1000; j += 100)
+	        	write(j, writeBytes);
+	     	for (j = 0; j < 1000; j += 100) {
+	        	read(j, readBytes);
+	        for (int k = 0; k < diskBlockSize; k++) {
+	          	if(!(Arrays.equals(writeBytes, readBytes))) {
+					SysLib.cerr("ERROR\n");
+            		SysLib.exit();
+				}
+	        }
+	      }
+	    }
     }
 
 	private void mixedAccess() { 
