@@ -73,28 +73,25 @@ public class Test4 extends Thread {
 			case 5: {
 				randomAccess();
 				stopTime = new Date().getTime();
-				getPerformance("| Random Access | ");	 	
+				getPerformance("| Random Access | ");
+
 				startTime = new Date().getTime();	
 				localizedAccess();	
 				stopTime = new Date().getTime();
-				getPerformance("| Localized Access | ");	
+				getPerformance("| Localized Access | ");
+
 				startTime = new Date().getTime();	
 				mixedAccess(); 	
 				stopTime = new Date().getTime();
-				getPerformance("| Mixed Access | ");	
+				getPerformance("| Mixed Access | ");
+
 				startTime = new Date().getTime();	
 				adversaryAccess(); 	
 				stopTime = new Date().getTime();
 				getPerformance("| Adversary Access |");	
-			}     			  			  			  			  			
-    	}
-		
-		if(cacheEnabled) {
-			SysLib.csync();		
-		} else {
-			SysLib.sync();
-		}
-		SysLib.exit( );                               
+			}    
+			SysLib.exit( );    			  			  			  			  			
+    	}                            
     }
 
 	private void reader(int blockId, byte[] buffer) {
