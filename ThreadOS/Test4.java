@@ -119,19 +119,21 @@ public class Test4 extends Thread {
 
 	private void localizedAccess() {  
 		for (int i = 0; i < 20; i++) {
-	     	for (int j = 0; j < diskBlockSize; j++)
+	     	for (int j = 0; j < diskBlockSize; j++) {
 	        	writeBytes[j] = ((byte)(i + j));
-	      	for (j = 0; j < 1000; j += 100)
+	     	} 
+	      	for (int j = 0; j < 1000; j += 100) {
 	        	write(j, writeBytes);
-	     	for (j = 0; j < 1000; j += 100) {
+	      	}
+	     	for (int j = 0; j < 1000; j += 100) {
 	        	read(j, readBytes);
-	        for (int k = 0; k < diskBlockSize; k++) {
-	          	if(!(Arrays.equals(writeBytes, readBytes))) {
-					SysLib.cerr("ERROR\n");
-            		SysLib.exit();
-				}
-	        }
-	      }
+		        for (int k = 0; k < diskBlockSize; k++) {
+		          	if(!(Arrays.equals(writeBytes, readBytes))) {
+						SysLib.cerr("ERROR\n");
+	            		SysLib.exit();
+					}
+	        	}
+	      	}
 	    }
     }
 
