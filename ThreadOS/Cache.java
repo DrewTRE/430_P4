@@ -5,6 +5,7 @@ public class Cache {
 	private int 	newVictim;									
 	private int 	blockSize;		
 	private Entry[] pageTable;
+	private int 	foundPage; 
     
     private class Entry { 
 		int 		blockFrameNumber;
@@ -67,19 +68,19 @@ public class Cache {
 		if(blockId > 1000) {
 			return false;
 		}
-		foundP = findBlock(blockId);				
-		if(foundP != -1) { 	
-			pageTable[foundP].blockFrameNumber 	= blockId;	
-			System.arraycopy(pageTable[foundP].dataBlock, 0, buffer, 0, blockSize);	
-			pageTable[foundP].refBit 			= true; 
+		foundPage = findBlock(blockId);				
+		if(foundPage != -1) { 	
+			pageTable[foundPage].blockFrameNumber 	= blockId;	
+			System.arraycopy(pageTable[foundPage].dataBlock, 0, buffer, 0, blockSize);	
+			pageTable[foundPage].refBit 			= true; 
 			return true; 
 		}
-		foundP = findFreePage();					
-		if(foundP != -1) { 	
-			SysLib.rawread(blockId, pageTable[foundP].dataBlock); 
-			pageTable[foundP].blockFrameNumber 	= blockId;				
-			pageTable[foundP].refBit 			= true;	
-			System.arraycopy(pageTable[foundP].dataBlock, 0, buffer, 0, blockSize);	
+		foundPage = findFreePage();					
+		if(foundPage != -1) { 	
+			SysLib.rawread(blockId, pageTable[foundPage].dataBlock); 
+			pageTable[foundPage].blockFrameNumber 	= blockId;				
+			pageTable[foundPage].refBit 			= true;	
+			System.arraycopy(pageTable[foundPage].dataBlock, 0, buffer, 0, blockSize);	
 			return true;
 		}
 		writeBack(nextVictim());	
@@ -95,21 +96,21 @@ public class Cache {
 		if(blockId > 1000) {
 			return false;
 		}
-		foundP = findBlock(blockId);					
-		if(foundP != -1) { 	
-			System.arraycopy(buffer, 0, pageTable[foundP].dataBlock, 0, blockSize);
-			pageTable[foundP].blockFrameNumber 	= blockId;
-			pageTable[foundP].dirtyBit 			= true;						
-			pageTable[foundP].refBit 			= true;	
+		foundPage = findBlock(blockId);					
+		if(foundPage != -1) { 	
+			System.arraycopy(buffer, 0, pageTable[foundPage].dataBlock, 0, blockSize);
+			pageTable[foundPage].blockFrameNumber 	= blockId;
+			pageTable[foundPage].dirtyBit 			= true;						
+			pageTable[foundPage].refBit 			= true;	
 			return true; 
 		}	
 
-		foundP = findFreePage();					
-		if(foundP != -1) { 	
-			System.arraycopy(buffer, 0, pageTable[foundP].dataBlock, 0, blockSize);
-			pageTable[foundP].blockFrameNumber 	= blockId;	
-			pageTable[foundP].dirtyBit 			= true;						
-			pageTable[foundP].refBit 			= true;	
+		foundPage = findFreePage();					
+		if(foundPage != -1) { 	
+			System.arraycopy(buffer, 0, pageTable[foundPage].dataBlock, 0, blockSize);
+			pageTable[foundPage].blockFrameNumber 	= blockId;	
+			pageTable[foundPage].dirtyBit 			= true;						
+			pageTable[foundPage].refBit 			= true;	
 			return true; 
 		}
 		writeBack(nextVictim());
