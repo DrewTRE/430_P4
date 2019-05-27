@@ -4,12 +4,12 @@ import java.util.Date;
 import java.util.Random;
 
 public class Test4 extends Thread {
-	private int cachedBlocks 		= 10;	
-	private int arrayTest 			= 200;	
-	private int diskBlockSize 		= 512;	
+	private int cachedBlocks 	= 10;	
+	private int arrayTest 		= 200;	
+	private int diskBlockSize 	= 512;	
 	private int testing;
-	private String status 			= "disabled";
-	private boolean cacheEnabled 	= false;	
+	private String status 		= "disabled";
+	private boolean enabled 	= false;	
 	private byte[] readBytes;	
 	private byte[] writeBytes;	
 	private Random random;
@@ -18,7 +18,7 @@ public class Test4 extends Thread {
     private long stopTime;                            
 
     private void getPerformance(String testName) {
-    	if (cacheEnabled == true) {
+    	if (enabled == true) {
 	      SysLib.cout("Test: " + testName + " | Cache: Enabled | " 	+ (stopTime - startTime) + "ms \n");
 	    } else {
 	      SysLib.cout("Test: " + testName + " | Cache: Disabled | " + (stopTime - startTime) + "ms \n");
@@ -31,10 +31,10 @@ public class Test4 extends Thread {
 		random 		= new Random();
 
 		if(args[0].equals("enabled")) {
-			cacheEnabled  	= true; 
+			enabled  	= true; 
 			status 			= "enabled";	
 		} else {
-			cacheEnabled  	= false;	 
+			enabled  	= false;	 
 			status 			= "disabled"; 
 		}
 
@@ -72,7 +72,7 @@ public class Test4 extends Thread {
 			}	      			  			  			  			  			
     	}
 		
-		if(cacheEnabled) {
+		if(enabled) {
 			SysLib.csync();		
 		} else {
 			SysLib.sync();
@@ -80,16 +80,16 @@ public class Test4 extends Thread {
 		SysLib.exit( );                               
     }
 
-	private void reader(int blockId, byte[] buffer) {
-		if (cacheEnabled) {
+	private void read(int blockId, byte[] buffer) {
+		if (enabled) {
 			SysLib.cread(blockId, buffer);
 		} else {
 			SysLib.rawread(blockId, buffer);
 		}
 	}
 	
-	private void writer(int blockId, byte[] buffer) {
-		if (cacheEnabled) {
+	private void write(int blockId, byte[] buffer) {
+		if (enabled) {
 			SysLib.cwrite(blockId, buffer);
 		} else {
 			SysLib.rawwrite(blockId, buffer);
@@ -105,11 +105,11 @@ public class Test4 extends Thread {
 		}
 
 		for (int i = 0; i < arrayTest; i++) {
-			writer(randomAccessArr[i], writeBytes); 
+			write(randomAccessArr[i], writeBytes); 
 		}
 
 		for(int i = 0; i < arrayTest; i++) {	
-			reader(randomAccessArr[i], readBytes);
+			read(randomAccessArr[i], readBytes);
 		}
 
 		if(!(Arrays.equals(writeBytes, readBytes))) {
@@ -119,17 +119,15 @@ public class Test4 extends Thread {
 	}
 
 	private void localizedAccess() {    
-		random.nextBytes(writeBytes); 
-        
         for(int i = 0; i < arrayTest; i++) {                
-          for(int j = 0; j < cachedBlocks; j++)	{                  
-			writer(j, writeBytes); 
+          	for(int j = 0; j < cachedBlocks; j++)	{                  
+				write(j, writeBytes); 
 			}
 		}	
 
         for(int i = 0; i < arrayTest; i++) {                
         	for(int j = 0; j < cachedBlocks; j++) {  
-				reader(j, readBytes);
+				read(j, readBytes);
 			}
         }
 	
@@ -139,8 +137,7 @@ public class Test4 extends Thread {
 		}
     }
 
-	private void mixedAccess()
-	{ 
+	private void mixedAccess() { 
 		random.nextBytes(writeBytes);
 		int[] mixedAccessArr = new int[arrayTest];            
         for(int i = 0; i < arrayTest; i++) {   
@@ -152,11 +149,11 @@ public class Test4 extends Thread {
         }
 		
         for(int i = 0; i < arrayTest; i++) {    
-             writer(mixedAccessArr[i], writeBytes);              
+             write(mixedAccessArr[i], writeBytes);              
         }		
         
         for(int i = 0; i < arrayTest; i++) {            
-            reader(mixedAccessArr[i], readBytes);                         
+            read(mixedAccessArr[i], readBytes);                         
         }		
 		
 		if(!(Arrays.equals(writeBytes, readBytes))) {
@@ -166,14 +163,12 @@ public class Test4 extends Thread {
     }
 
 	private void adversaryAccess() {	
-		random.nextBytes(writeBytes); 
-     		
         for (int i = cachedBlocks; i < diskBlockSize; i++) {                                 
-            writer(i, writeBytes);                  
+            write(i, writeBytes);                  
         }        
                  
         for (int i = cachedBlocks; i < diskBlockSize; i++) {              
-            reader(i, readBytes);                             
+            read(i, readBytes);                             
         }        		
 		
 		if(!(Arrays.equals(writeBytes, readBytes))) {
