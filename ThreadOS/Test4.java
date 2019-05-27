@@ -18,7 +18,7 @@ public class Test4 extends Thread {
     private long stopTime;                            
 
     private void getPerformance(String testName) {
-    	if (enabled == true) {
+    	if (cacheEnabled == true) {
 	      SysLib.cout("Test " + testName + "(cache enabled): " + (stopTime - startTime) + "\n");
 	    } else {
 	      SysLib.cout("Test " + testName + "(cache disabled): " + (stopTime - startTime) + "\n");
@@ -119,23 +119,18 @@ public class Test4 extends Thread {
 
 	private void localizedAccess() {    
 		random.nextBytes(writeBytes); 
-		startWriteTime = new Date().getTime();
         
         for(int i = 0; i < arrayTest; i++) {                
           for(int j = 0; j < cachedBlocks; j++)	{                  
 			writer(j, writeBytes); 
 			}
-		}
-        
-        stopWriteTime = new Date().getTime(); 		
-		startReadTime = new Date().getTime();		
+		}	
 
         for(int i = 0; i < arrayTest; i++) {                
         	for(int j = 0; j < cachedBlocks; j++) {  
 				reader(j, readBytes);
 			}
         }
-		stopReadTime = new Date().getTime();
 	
 		if(!(Arrays.equals(writeBytes, readBytes))) {
 			 SysLib.cout("DISK VALIDITY ERROR: writerBytes and readBytes equal\n");
@@ -157,14 +152,11 @@ public class Test4 extends Thread {
 		startWriteTime = new Date().getTime();		
         for(int i = 0; i < arrayTest; i++) {    
              writer(mixedAccessArr[i], writeBytes);              
-        }
-        stopWriteTime = new Date().getTime();				
-		startReadTime = new Date().getTime();			
+        }		
         
         for(int i = 0; i < arrayTest; i++) {            
             reader(mixedAccessArr[i], readBytes);                         
-        }
-        stopReadTime = new Date().getTime();			
+        }		
 		
 		if(!(Arrays.equals(writeBytes, readBytes))) {
 			 SysLib.cout("DISK VALIDITY ERROR: writerBytes and readBytes equal\n");
@@ -177,13 +169,10 @@ public class Test4 extends Thread {
         for (int i = cachedBlocks; i < diskBlockSize; i++) {                                 
             writer(i, writeBytes);                  
         }        
-        stopWriteTime = new Date().getTime();  			
-		
-        startReadTime = new Date().getTime();                     
+                 
         for (int i = cachedBlocks; i < diskBlockSize; i++) {              
             reader(i, readBytes);                             
-        }        
-        stopReadTime = new Date().getTime();    		
+        }        		
 		
 		if(!(Arrays.equals(writeBytes, readBytes))) {
 			 SysLib.cout("DISK VALIDITY ERROR: writerBytes and readBytes equal\n");
