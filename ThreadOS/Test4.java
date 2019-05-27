@@ -5,12 +5,12 @@ import java.util.Date;
 import java.util.Random;
 
 public class Test4 extends Thread {
-	private int cachedBlocks = 10;	
-	private int arrayTest = 200;	
-	private int diskBlockSize = 512;	
+	private int cachedBlocks 		= 10;	
+	private int arrayTest 			= 200;	
+	private int diskBlockSize 		= 512;	
 	private int testing;
-	private String status = "disabled";
-	private boolean cacheEnabled = false;	
+	private String status 			= "disabled";
+	private boolean cacheEnabled 	= false;	
 	private byte[] readBuffer;	
 	private byte[] writeBuffer;	
 	private Random random;
@@ -22,15 +22,15 @@ public class Test4 extends Thread {
 
 	public Test4(String[] args) {
 		writeBuffer = new byte[diskBlockSize];               
-        readBuffer = new byte[diskBlockSize]; 
-		random = new Random();
+        readBuffer 	= new byte[diskBlockSize]; 
+		random 		= new Random();
 
 		if(args[0].equals("enabled")) {
-			cacheEnabled  = true; 
-			status = "enabled";	
+			cacheEnabled  	= true; 
+			status 			= "enabled";	
 		} else {
-			cacheEnabled  = false;	 
-			status = "disabled"; 
+			cacheEnabled  	= false;	 
+			status 			= "disabled"; 
 		}
 
         testing = Integer.parseInt(args[1]);
@@ -108,10 +108,10 @@ public class Test4 extends Thread {
 		if(!(Arrays.equals(writeBuffer, readBuffer))) {
 			 SysLib.cout("DISK VALIDITY ERROR: writerBytes and readBuffer equal\n");
 		}	
-		SysLib.cout("Testing with randomAccess(), using Test Case:" + testing + "\n");
+		SysLib.cout("Testing randomAccess(), using Test :" + testing + "\n");
 		SysLib.cout("Cache: [" + status + "] \n");
-		SysLib.cout("Average time for Write is: " + ((stopWriteTime - startWriteTime) / 200) + " milliseconds \n");
-		SysLib.cout("Average time for Read is: " + ((stopReadTime - startReadTime) / 200)+ " milliseconds \n");
+		SysLib.cout("Avg time for Write : " + ((stopWriteTime - startWriteTime) / 200) + " ms \n");
+		SysLib.cout("Avg time for Read  : " + ((stopReadTime - startReadTime) / 200)+ " ms \n");
 	}
 
 	private void localizedAccess() {    
@@ -137,10 +137,10 @@ public class Test4 extends Thread {
 		if(!(Arrays.equals(writeBuffer, readBuffer))) {
 			 SysLib.cout("DISK VALIDITY ERROR: writerBytes and readBuffer equal\n");
 		}
-		SysLib.cout("Testing with localizedAccess(), using Test Case:" + testing + "\n");
+		SysLib.cout("Testing localizedAccess(), using Test :" + testing + "\n");
 		SysLib.cout("Cache: [" + status + "] \n");
-		SysLib.cout("Average time for Write is: " + ((stopWriteTime - startWriteTime) / 200) + " milliseconds \n");
-		SysLib.cout("Average time for Read is: " + ((stopReadTime - startReadTime) / 200)+ " milliseconds \n");
+		SysLib.cout("Avg time for Write : " + ((stopWriteTime - startWriteTime) / 200) + " ms \n");
+		SysLib.cout("Avg time for Read  : " + ((stopReadTime - startReadTime) / 200)+ " ms \n");
     }
 
 	private void mixedAccess()
@@ -171,10 +171,10 @@ public class Test4 extends Thread {
 			 SysLib.cout("DISK VALIDITY ERROR: writerBytes and readBuffer equal\n");
 		}
 
-		SysLib.cout("Testing with mixedAccess(), using Test Case:" + testing + "\n");
+		SysLib.cout("Testing mixedAccess(), using Test :" + testing + "\n");
 		SysLib.cout("Cache: [" + status + "] \n");
-		SysLib.cout("Average time for Write is: " + ((stopWriteTime - startWriteTime) / 200) + " milliseconds \n");
-		SysLib.cout("Average time for Read is: " + ((stopReadTime - startReadTime) / 200)+ " milliseconds \n");
+		SysLib.cout("Avg time for Write : " + ((stopWriteTime - startWriteTime) / 200) + " ms \n");
+		SysLib.cout("Avg time for Read  : " + ((stopReadTime - startReadTime) / 200)+ " ms \n");
     }
 
 	private void adversaryAccess() {	
@@ -195,10 +195,10 @@ public class Test4 extends Thread {
 			 SysLib.cout("DISK VALIDITY ERROR: writerBytes and readBuffer equal\n");
 		}
 
-		SysLib.cout("Testing with adversaryAccess(), using Test Case:" + testing + "\n");
+		SysLib.cout("Testing adversaryAccess(), using Test :" + testing + "\n");
 		SysLib.cout("Cache: [" + status + "] \n");
-		SysLib.cout("Average time for Write is: " + ((stopWriteTime - startWriteTime) / 200) + " milliseconds \n");
-		SysLib.cout("Average time for Read is: " + ((stopReadTime - startReadTime) / 200)+ " milliseconds \n");
+		SysLib.cout("Avg time for Write : " + ((stopWriteTime - startWriteTime) / 200) + " ms \n");
+		SysLib.cout("Avg time for Read  : " + ((stopReadTime - startReadTime) / 200)+ " ms \n");
 
     }
 }
