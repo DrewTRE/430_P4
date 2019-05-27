@@ -19,9 +19,9 @@ public class Test4 extends Thread {
 
     private void getPerformance(String testName) {
     	if (cacheEnabled == true) {
-	      SysLib.cout("Test " + testName + "(cache enabled): " + (stopTime - startTime) + "\n");
+	      SysLib.cout("Test: " + testName + " | Cache: Enabled | " 	+ (stopTime - startTime) + "ms \n");
 	    } else {
-	      SysLib.cout("Test " + testName + "(cache disabled): " + (stopTime - startTime) + "\n");
+	      SysLib.cout("Test: " + testName + " | Cache: Disabled | " + (stopTime - startTime) + "ms \n");
 		}
   	}
 
@@ -49,27 +49,44 @@ public class Test4 extends Thread {
     		case 1:	{
 				randomAccess();
 				stopTime = new Date().getTime();
-				getPerformance("Random Access");	 	
+				getPerformance("| Random Access | ");	 	
 				break;        
 			}
     		case 2: {
 				localizedAccess();	
 				stopTime = new Date().getTime();
-				getPerformance("Localized Access");	
+				getPerformance("| Localized Access | ");	
 				break;        
 			}
 			case 3: {
 				mixedAccess(); 	
 				stopTime = new Date().getTime();
-				getPerformance("Mixed Access");	
+				getPerformance("| Mixed Access | ");	
 				break;        
 			}
     		case 4: {
 				adversaryAccess(); 	
 				stopTime = new Date().getTime();
-				getPerformance("Adversary Access");	
+				getPerformance("| Adversary Access |");	
 				break;        
-			}	      			  			  			  			  			
+			}	 
+			case 5: {
+				randomAccess();
+				stopTime = new Date().getTime();
+				getPerformance("| Random Access | ");	 	
+				startTime = new Date().getTime();	
+				localizedAccess();	
+				stopTime = new Date().getTime();
+				getPerformance("| Localized Access | ");	
+				startTime = new Date().getTime();	
+				mixedAccess(); 	
+				stopTime = new Date().getTime();
+				getPerformance("| Mixed Access | ");	
+				startTime = new Date().getTime();	
+				adversaryAccess(); 	
+				stopTime = new Date().getTime();
+				getPerformance("| Adversary Access |");	
+			}     			  			  			  			  			
     	}
 		
 		if(cacheEnabled) {
@@ -113,7 +130,8 @@ public class Test4 extends Thread {
 		}
 
 		if(!(Arrays.equals(writeBytes, readBytes))) {
-			 SysLib.cout("DISK VALIDITY ERROR: writerBytes and readBytes equal\n");
+			SysLib.cerr("ERROR\n");
+            SysLib.exit();
 		}	
 	}
 
@@ -133,7 +151,8 @@ public class Test4 extends Thread {
         }
 	
 		if(!(Arrays.equals(writeBytes, readBytes))) {
-			 SysLib.cout("DISK VALIDITY ERROR: writerBytes and readBytes equal\n");
+			SysLib.cerr("ERROR\n");
+            SysLib.exit();
 		}
     }
 
@@ -158,7 +177,8 @@ public class Test4 extends Thread {
         }		
 		
 		if(!(Arrays.equals(writeBytes, readBytes))) {
-			 SysLib.cout("DISK VALIDITY ERROR: writerBytes and readBytes equal\n");
+			SysLib.cerr("ERROR\n");
+            SysLib.exit();
 		}
     }
 
@@ -174,7 +194,8 @@ public class Test4 extends Thread {
         }        		
 		
 		if(!(Arrays.equals(writeBytes, readBytes))) {
-			 SysLib.cout("DISK VALIDITY ERROR: writerBytes and readBytes equal\n");
+			SysLib.cerr("ERROR\n");
+            SysLib.exit();
 		}
     }
 }
