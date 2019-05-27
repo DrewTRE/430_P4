@@ -146,7 +146,7 @@ public class Test4 extends Thread {
 	    }
     }
 
-    // Test of 90% localized and 10% randomlized. 
+    // Test of 90% localized and 10% randomized. 
 	private void mixedAccess() { 
 		random.nextBytes(writeBytes);
 		int[] mixedAccessArr = new int[arrayTest];            
