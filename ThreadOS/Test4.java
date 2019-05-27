@@ -149,7 +149,6 @@ public class Test4 extends Thread {
             }            
         }
 		
-		startWriteTime = new Date().getTime();		
         for(int i = 0; i < arrayTest; i++) {    
              writer(mixedAccessArr[i], writeBytes);              
         }		
@@ -165,7 +164,7 @@ public class Test4 extends Thread {
 
 	private void adversaryAccess() {	
 		random.nextBytes(writeBytes); 
-        startWriteTime = new Date().getTime();   		
+     		
         for (int i = cachedBlocks; i < diskBlockSize; i++) {                                 
             writer(i, writeBytes);                  
         }        
