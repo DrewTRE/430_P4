@@ -1,9 +1,16 @@
+/*
+Author: Drew Kwak
+Date: 5/26/2019
+Description: Test file for: Random, Localized, Mixed, Adversary. 
+*/
+
 import java.util.*;
 import java.io.*;
 import java.util.Date;
 import java.util.Random;
 
 public class Test4 extends Thread {
+	// Data Members. 
 	private int cachedBlocks 	= 10;	
 	private int arrayTest 		= 200;	
 	private int diskBlockSize 	= 512;	
@@ -16,31 +23,33 @@ public class Test4 extends Thread {
 	private long startTime;                           
     private long stopTime;                            
 
+    // Return Performance of each Test. 
     private void getPerformance(String testName) {
     	if (enabled == true) {
-	      SysLib.cout("Test: " + testName + " | Cache: Enabled | " 	+ (stopTime - startTime) + "ms \n");
+	      SysLib.cout("Test: | " + testName + " | Cache: Enabled | " 	+ (stopTime - startTime) + "ms \n");
 	    } else {
-	      SysLib.cout("Test: " + testName + " | Cache: Disabled | " + (stopTime - startTime) + "ms \n");
+	      SysLib.cout("Test: | " + testName + " | Cache: Disabled | " 	+ (stopTime - startTime) + "ms \n");
 		}
   	}
 
+  	// Creates disk blocks of size 512 and checks if cache is enabled/disabled. 
 	public Test4(String[] args) {
-		writeBytes = new byte[diskBlockSize];               
+		writeBytes 	= new byte[diskBlockSize];               
         readBytes 	= new byte[diskBlockSize]; 
 		random 		= new Random();
 
 		if(args[0].equals("enabled")) {
-			enabled  	= true; 
-			status 			= "enabled";	
+			enabled = true; 
+			status 	= "enabled";	
 		} else {
-			enabled  	= false;	 
-			status 			= "disabled"; 
+			enabled = false;	 
+			status 	= "disabled"; 
 		}
-
         testing = Integer.parseInt(args[1]);
         
     }
 
+    // Switch statement to pick which test to run. 
 	public void run( ) {
     	SysLib.flush();
     	startTime = new Date().getTime();							
@@ -48,29 +57,29 @@ public class Test4 extends Thread {
     		case 1:	{
 				randomAccess();
 				stopTime = new Date().getTime();
-				getPerformance("| Random Access | ");	 	
+				getPerformance("Random Access");	 	
 				break;        
 			}
     		case 2: {
 				localizedAccess();	
 				stopTime = new Date().getTime();
-				getPerformance("| Localized Access | ");	
+				getPerformance("Localized Access");	
 				break;        
 			}
 			case 3: {
 				mixedAccess(); 	
 				stopTime = new Date().getTime();
-				getPerformance("| Mixed Access | ");	
+				getPerformance("Mixed Access");	
 				break;        
 			}
     		case 4: {
 				adversaryAccess(); 	
 				stopTime = new Date().getTime();
-				getPerformance("| Adversary Access |");	
+				getPerformance("Adversary Access");	
 				break;        
 			}	      			  			  			  			  			
     	}
-		
+    	// Sync with disk depending on if cache is enabled or disabled. 		
 		if(enabled) {
 			SysLib.csync();		
 		} else {
@@ -79,6 +88,7 @@ public class Test4 extends Thread {
 		SysLib.exit( );                               
     }
 
+    // Determine to use cread or rawread depending if cache is enabled or disabled. 
 	private void read(int blockId, byte[] buffer) {
 		if (enabled) {
 			SysLib.cread(blockId, buffer);
@@ -87,6 +97,7 @@ public class Test4 extends Thread {
 		}
 	}
 	
+	// Determine to use cwrite or rawwrite depending if cache is enabled or disabled. 
 	private void write(int blockId, byte[] buffer) {
 		if (enabled) {
 			SysLib.cwrite(blockId, buffer);
@@ -95,29 +106,28 @@ public class Test4 extends Thread {
 		}
 	}
 
+	// Test that just randomly accesses blocks. 
 	private void randomAccess() {
 		random.nextBytes(writeBytes); 
-		int[] randomAccessArr = new int[arrayTest];
-		
+		int[] randomAccessArr = new int[arrayTest];	
 		for(int i = 0; i < arrayTest; i++) {
 			randomAccessArr[i] = Math.abs(random.nextInt() % diskBlockSize);
 		}
-
 		for (int i = 0; i < arrayTest; i++) {
 			write(randomAccessArr[i], writeBytes); 
 		}
-
 		for(int i = 0; i < arrayTest; i++) {	
 			read(randomAccessArr[i], readBytes);
 		}
-
 		if(!(Arrays.equals(writeBytes, readBytes))) {
 			SysLib.cerr("ERROR\n");
             SysLib.exit();
 		}	
 	}
 
-	private void localizedAccess() {  
+	// Localized test that read and writes on the same 10 blocks repeatedly.  
+	private void localizedAccess() {
+		random.nextBytes(writeBytes);   
 		for (int i = 0; i < 20; i++) {
 	     	for (int j = 0; j < diskBlockSize; j++) {
 	        	writeBytes[j] = ((byte)(i + j));
@@ -137,6 +147,7 @@ public class Test4 extends Thread {
 	    }
     }
 
+    // Test of 90% localized and 10% randomlized. 
 	private void mixedAccess() { 
 		random.nextBytes(writeBytes);
 		int[] mixedAccessArr = new int[arrayTest];            
@@ -146,23 +157,22 @@ public class Test4 extends Thread {
             } else {   
                 mixedAccessArr[i] = Math.abs(random.nextInt() % diskBlockSize);         
             }            
-        }
-		
+        }	
         for(int i = 0; i < arrayTest; i++) {    
              write(mixedAccessArr[i], writeBytes);              
         }		
-        
         for(int i = 0; i < arrayTest; i++) {            
             read(mixedAccessArr[i], readBytes);                         
         }		
-		
 		if(!(Arrays.equals(writeBytes, readBytes))) {
 			SysLib.cerr("ERROR\n");
             SysLib.exit();
 		}
     }
 
-	private void adversaryAccess() {	
+    // Test to access blocks that will generate a miss. 
+	private void adversaryAccess() {
+		random.nextBytes(writeBytes); 	
         for (int i = cachedBlocks; i < diskBlockSize; i++) {                                 
             write(i, writeBytes);                  
         }        
