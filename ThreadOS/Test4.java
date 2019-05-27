@@ -11,9 +11,9 @@ import java.util.Random;
 
 public class Test4 extends Thread {
 	// Data Members. 
-	private int cachedBlocks 	= 10;	
+	private int cacheBlocks 	= 10;	
 	private int arrayTest 		= 200;	
-	private int diskBlockSize 	= 512;	
+	private int blockSize 		= 512;	
 	private int testing;
 	private String status 		= "disabled";
 	private boolean enabled 	= false;	
@@ -34,8 +34,8 @@ public class Test4 extends Thread {
 
   	// Creates disk blocks of size 512 and checks if cache is enabled/disabled. 
 	public Test4(String[] args) {
-		writeBytes 	= new byte[diskBlockSize];               
-        readBytes 	= new byte[diskBlockSize]; 
+		writeBytes 	= new byte[blockSize];               
+        readBytes 	= new byte[blockSize]; 
 		random 		= new Random();
 
 		if(args[0].equals("enabled")) {
@@ -45,7 +45,7 @@ public class Test4 extends Thread {
 			enabled = false;	 
 			status 	= "disabled"; 
 		}
-        testing = Integer.parseInt(args[1]);
+        testing 	= Integer.parseInt(args[1]);
         
     }
 
@@ -111,7 +111,7 @@ public class Test4 extends Thread {
 		random.nextBytes(writeBytes); 
 		int[] randomAccessArr = new int[arrayTest];	
 		for(int i = 0; i < arrayTest; i++) {
-			randomAccessArr[i] = Math.abs(random.nextInt() % diskBlockSize);
+			randomAccessArr[i] = Math.abs(random.nextInt() % blockSize);
 		}
 		for (int i = 0; i < arrayTest; i++) {
 			write(randomAccessArr[i], writeBytes); 
@@ -126,10 +126,9 @@ public class Test4 extends Thread {
 	}
 
 	// Localized test that read and writes on the same 10 blocks repeatedly.  
-	private void localizedAccess() {
-		random.nextBytes(writeBytes);   
+	private void localizedAccess() { 
 		for (int i = 0; i < 20; i++) {
-	     	for (int j = 0; j < diskBlockSize; j++) {
+	     	for (int j = 0; j < blockSize; j++) {
 	        	writeBytes[j] = ((byte)(i + j));
 	     	} 
 	      	for (int j = 0; j < 1000; j += 100) {
@@ -137,7 +136,7 @@ public class Test4 extends Thread {
 	      	}
 	     	for (int j = 0; j < 1000; j += 100) {
 	        	read(j, readBytes);
-		        for (int k = 0; k < diskBlockSize; k++) {
+		        for (int k = 0; k < blockSize; k++) {
 		          	if(!(Arrays.equals(writeBytes, readBytes))) {
 						SysLib.cerr("ERROR\n");
 	            		SysLib.exit();
@@ -152,14 +151,14 @@ public class Test4 extends Thread {
 		random.nextBytes(writeBytes);
 		int[] mixedAccessArr = new int[arrayTest];            
         for(int i = 0; i < arrayTest; i++) {   
-            if(Math.abs(random.nextInt() % cachedBlocks) <= 8) {
-            	mixedAccessArr[i] = Math.abs(random.nextInt() % cachedBlocks);            
+            if(Math.abs(random.nextInt() % cacheBlocks) <= 8) {
+            	mixedAccessArr[i] = Math.abs(random.nextInt() % cacheBlocks);            
             } else {   
-                mixedAccessArr[i] = Math.abs(random.nextInt() % diskBlockSize);         
+                mixedAccessArr[i] = Math.abs(random.nextInt() % blockSize);         
             }            
         }	
         for(int i = 0; i < arrayTest; i++) {    
-             write(mixedAccessArr[i], writeBytes);              
+            write(mixedAccessArr[i], writeBytes);              
         }		
         for(int i = 0; i < arrayTest; i++) {            
             read(mixedAccessArr[i], readBytes);                         
@@ -171,16 +170,13 @@ public class Test4 extends Thread {
     }
 
     // Test to access blocks that will generate a miss. 
-	private void adversaryAccess() {
-		random.nextBytes(writeBytes); 	
-        for (int i = cachedBlocks; i < diskBlockSize; i++) {                                 
+	private void adversaryAccess() {	
+        for (int i = cacheBlocks; i < blockSize; i++) {                                 
             write(i, writeBytes);                  
-        }        
-                 
-        for (int i = cachedBlocks; i < diskBlockSize; i++) {              
+        }                    
+        for (int i = cacheBlocks; i < blockSize; i++) {              
             read(i, readBytes);                             
-        }        		
-		
+        }        			
 		if(!(Arrays.equals(writeBytes, readBytes))) {
 			SysLib.cerr("ERROR\n");
             SysLib.exit();
