@@ -69,29 +69,30 @@ public class Test4 extends Thread {
 				stopTime = new Date().getTime();
 				getPerformance("| Adversary Access |");	
 				break;        
-			}	 
+			}	      			  			  			  			  			
+    	}
+		
 		if(cacheEnabled) {
-		SysLib.csync();		
+			SysLib.csync();		
 		} else {
 			SysLib.sync();
 		}
-		SysLib.exit( );   		   		  			  			  			  			
-    	}                            
+		SysLib.exit( );                               
     }
 
-	private void read(int blockID, byte[] buffer) {
+	private void reader(int blockId, byte[] buffer) {
 		if (cacheEnabled) {
-			SysLib.cread(blockID, buffer);
+			SysLib.cread(blockId, buffer);
 		} else {
-			SysLib.rawread(blockID, buffer);
+			SysLib.rawread(blockId, buffer);
 		}
 	}
 	
-	private void write(int blockID, byte[] buffer) {
+	private void writer(int blockId, byte[] buffer) {
 		if (cacheEnabled) {
-			SysLib.cwrite(blockID, buffer);
+			SysLib.cwrite(blockId, buffer);
 		} else {
-			SysLib.rawwrite(blockID, buffer);
+			SysLib.rawwrite(blockId, buffer);
 		}
 	}
 
@@ -104,11 +105,11 @@ public class Test4 extends Thread {
 		}
 
 		for (int i = 0; i < arrayTest; i++) {
-			write(randomAccessArr[i], writeBytes); 
+			writer(randomAccessArr[i], writeBytes); 
 		}
 
 		for(int i = 0; i < arrayTest; i++) {	
-			read(randomAccessArr[i], readBytes);
+			reader(randomAccessArr[i], readBytes);
 		}
 
 		if(!(Arrays.equals(writeBytes, readBytes))) {
@@ -122,13 +123,13 @@ public class Test4 extends Thread {
         
         for(int i = 0; i < arrayTest; i++) {                
           for(int j = 0; j < cachedBlocks; j++)	{                  
-			write(j, writeBytes); 
+			writer(j, writeBytes); 
 			}
 		}	
 
         for(int i = 0; i < arrayTest; i++) {                
         	for(int j = 0; j < cachedBlocks; j++) {  
-				read(j, readBytes);
+				reader(j, readBytes);
 			}
         }
 	
@@ -151,11 +152,11 @@ public class Test4 extends Thread {
         }
 		
         for(int i = 0; i < arrayTest; i++) {    
-             write(mixedAccessArr[i], writeBytes);              
+             writer(mixedAccessArr[i], writeBytes);              
         }		
         
         for(int i = 0; i < arrayTest; i++) {            
-            read(mixedAccessArr[i], readBytes);                         
+            reader(mixedAccessArr[i], readBytes);                         
         }		
 		
 		if(!(Arrays.equals(writeBytes, readBytes))) {
@@ -168,11 +169,11 @@ public class Test4 extends Thread {
 		random.nextBytes(writeBytes); 
      		
         for (int i = cachedBlocks; i < diskBlockSize; i++) {                                 
-            write(i, writeBytes);                  
+            writer(i, writeBytes);                  
         }        
                  
         for (int i = cachedBlocks; i < diskBlockSize; i++) {              
-            read(i, readBytes);                             
+            reader(i, readBytes);                             
         }        		
 		
 		if(!(Arrays.equals(writeBytes, readBytes))) {
