@@ -22,10 +22,10 @@ public class Test4 extends Thread {
 	private Random random;
 	private long startTime;                           
     private long stopTime;  
-    private int startRead; 
-    private int stopRead; 
-    private int startWrite; 
-    private int stopWrite;                           
+    private Long startRead; 
+    private long stopRead; 
+    private Long startWrite; 
+    private Long stopWrite;                           
 
     // Return Performance of each Test. 
     private void getPerformance(String testName) {
